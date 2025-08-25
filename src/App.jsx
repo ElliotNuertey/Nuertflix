@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import Search from "./Components/Search"
 import Spinner from "./Components/Spinner";
+import MovieCard from "./Components/MovieCard";
 
 const API_BASE_URL = 'https://api.themoviedb.org/3/discover/movie';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -47,12 +48,11 @@ function App() {
 
   return (
     <main>
-      <div className="pattern " />
-      <div className="wrapper">
-        <header>
-          <img src="/Display.webp" alt="Hero-picture" />
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium">
-            Find All The Hottest <span className="font-bold text-blue-800">Movies</span> Here for Free💓
+      { <div /> }
+      <div >
+        <header className="flex flex-col gap-6">
+          <img className="h-[300px] w-auto object-cover object-center" src="/Display.webp" alt="Hero-picture" />
+          <h1 className=" text-center m-5 text-2xl sm:text-3xl md:text-4xl font-medium">Find All The Hottest <span className="font-bold text-blue-800">Movies</span> Here for Free💓
           </h1>
 
           <Search searchMovie={searchMovie} setsearchMovie={setsearchMovie} />
@@ -60,11 +60,11 @@ function App() {
         </header>
 
         <section className="All">
-          <h2 className="mt-[70px]">Movies</h2>
+          {/* <h2 className="text-center text-red-500 m-8 text-3xl">Movies</h2> */}
           {loading ? (<p className="text-black"><Spinner /></p>) : (errMessage ? <p className="text-red-500">{errMessage}</p> : (
-            <ul>
+            <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {movies.map(movie => (
-                <p className="text-black" key={movie.id}>{movie.title}</p>
+               <MovieCard key={movie.id} movie={movie}/>
               ))}
               </ul>
           
