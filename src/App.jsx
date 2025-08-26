@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Search from "./Components/Search"
 import Spinner from "./Components/Spinner";
 import MovieCard from "./Components/MovieCard";
+import MovieDetail from "./Components/MovieDetail";
+
 
 const API_BASE_URL = 'https://api.themoviedb.org/3/discover/movie';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -20,11 +23,11 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const getMovies = async () => {
+  const getMovies = async (query = "") => {
     setLoading(true);
     setErrMessage("");
     try {
-      const endpoint = `${API_BASE_URL}?sort_by=popularity.desc`;
+      const endpoint = query? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}` : `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc`;
       const response = await fetch(endpoint, API_OPTIONS);
 
       if (!response.ok) {
@@ -44,34 +47,44 @@ function App() {
     }
   }
 
-  useEffect(() => {getMovies();}, []);
+  useEffect(() => {getMovies(searchMovie);}, [searchMovie]);
 
   return (
-    <main>
-      { <div /> }
-      <div >
-        <header className="flex flex-col gap-6">
-          <img className="h-[300px] w-auto object-cover object-center" src="/Display.webp" alt="Hero-picture" />
-          <h1 className=" text-center m-5 text-2xl sm:text-3xl md:text-4xl font-medium">Find All The Hottest <span className="font-bold text-blue-800">Movies</span> Here for Free💓
-          </h1>
-
-          <Search searchMovie={searchMovie} setsearchMovie={setsearchMovie} />
-          <h1 className="text-black mt-4 text-lg sm:text-xl">{searchMovie}</h1>
-        </header>
-
-        <section className="All">
-          {/* <h2 className="text-center text-red-500 m-8 text-3xl">Movies</h2> */}
-          {loading ? (<p className="text-black"><Spinner /></p>) : (errMessage ? <p className="text-red-500">{errMessage}</p> : (
-            <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {movies.map(movie => (
-               <MovieCard key={movie.id} movie={movie}/>
-              ))}
-              </ul>
-          
-          ))}
-        </section>
-      </div>
-    </main>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <main>
+              <div>
+                <header className="flex flex-col gap-6">
+                  <img className="h-[300px] w-auto object-cover object-center" src="/Display.webp" alt="Hero-picture" />
+                  <h1 className=" text-center m-5 text-2xl sm:text-3xl md:text-4xl font-medium">
+                    Find All The Hottest <span className="font-bold text-blue-800">Movies</span> Here for Free💓
+                  </h1>
+                  <Search searchMovie={searchMovie} setsearchMovie={setsearchMovie} />
+                  <h1 className="text-black mt-4 text-lg sm:text-xl">{searchMovie}</h1>
+                </header>
+                <section className="All">
+                  {loading ? (
+                    <p className="text-black"><Spinner /></p>
+                  ) : errMessage ? (
+                    <p className="text-red-500">{errMessage}</p>
+                  ) : (
+                    <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                      {movies.map(movie => (
+                        <MovieCard key={movie.id} movie={movie} />
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              </div>
+            </main>
+          }
+        />
+        <Route path="/movie/:id" element={<MovieDetail />} />
+      </Routes>
+    </Router>
   )
 }
 
